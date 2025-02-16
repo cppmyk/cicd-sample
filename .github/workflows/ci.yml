@@ -23,6 +23,7 @@ jobs:
 
       - name: Test
         run: |
+          set -o pipefail
           ./hello test | tee "results.txt"
 
       - name: Package artifacts
