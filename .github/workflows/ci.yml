@@ -1,0 +1,51 @@
+name: CI/CD
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Build and Test
+        id: build_test
+        run: |
+          g++ -std=c++17 -o hello main.cpp
+          ./hello test | tee "results.txt"
+
+      - name: Package artifacts
+        if: success()
+        run: |
+          zip artifacts.zip hello
+
+      - name: Upload artifacts
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          path: artifacts.zip
+
+      - name: Send notification
+        if: always()
+        run: |
+          if [ "${{ steps.build_test.outcome }}" == "success" ]; then
+            STATUS="Success"
+          else
+            STATUS="Failure"
+          fi
+          
+          MESSAGE="GitHub Actions Build: '${{ github.workflow }}' Run #${{ github.run_number }} - Status: $STATUS"
+          TEST_RESULTS=$(cat "results.txt")
+          
+          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" \
+            -d chat_id="$TELEGRAM_CHAT_ID" \
+            -d text="$MESSAGE%0A$TEST_RESULTS"
