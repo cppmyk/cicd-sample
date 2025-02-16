@@ -4,7 +4,7 @@ on:
   pull_request:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   build:
@@ -14,22 +14,22 @@ jobs:
       TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Build and Test
-        id: build_test
+      - name: Build
+        id: build
         run: |
           g++ -std=c++17 -o hello main.cpp
+
+      - name: Test
+        run: |
           ./hello test | tee "results.txt"
 
       - name: Package artifacts
-        if: success()
         run: |
           zip artifacts.zip hello
 
       - name: Upload artifacts
-        if: success()
         uses: actions/upload-artifact@v4
         with:
           path: artifacts.zip
@@ -37,13 +37,13 @@ jobs:
       - name: Send notification
         if: always()
         run: |
-          if [ "${{ steps.build_test.outcome }}" == "success" ]; then
+          if [ "${{ steps.build.outcome }}" == "success" ]; then
             STATUS="Success"
           else
             STATUS="Failure"
           fi
           
-          MESSAGE="GitHub Actions Build: '${{ github.workflow }}' Run #${{ github.run_number }} - Status: $STATUS"
+          MESSAGE="GitHub Actions Build: '${{ github.workflow }}' Run #${{ github.run_number }} - Build status: $STATUS"
           TEST_RESULTS=$(cat "results.txt")
           
           curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" \
