@@ -43,9 +43,14 @@ jobs:
             STATUS="Failure"
           fi
           
-          MESSAGE="GitHub Actions Build: '${{ github.workflow }}' Run #${{ github.run_number }} - Build status: $STATUS"
           TEST_RESULTS=$(cat "results.txt")
+          MESSAGE="GHA Build
+          [${{ github.ref_name }}]
+          Run #${{ github.run_number }}
+          Build status: $STATUS
+          Test results:
+          $TEST_RESULTS"
           
           curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" \
             -d chat_id="$TELEGRAM_CHAT_ID" \
-            -d text="$MESSAGE%0A$TEST_RESULTS"
+            -d text="$MESSAGE"
