@@ -15,7 +15,13 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    sh 'g++ -std=c++17 -o hello main.cpp'
+                    try {
+                        sh 'g++ -std=c++17 -o hello main.cpp'
+                        buildStageStatus = 'Success'
+                    } catch (Exception e) {
+                        buildStageStatus = 'Failure'
+                        throw e
+                    }
                 }
             }
         }

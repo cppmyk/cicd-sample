@@ -44,7 +44,12 @@ jobs:
             STATUS="Failure"
           fi
           
-          TEST_RESULTS=$(cat "results.txt")
+          if [ -f "results.txt" ]; then
+            TEST_RESULTS=$(cat "results.txt")
+          else
+            TEST_RESULTS="No test results available"
+          fi
+  
           MESSAGE="GHA Build
           [${{ github.ref_name }}]
           
