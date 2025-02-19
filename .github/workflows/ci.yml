@@ -47,9 +47,9 @@ jobs:
           TEST_RESULTS=$(cat "results.txt")
           MESSAGE="GHA Build
           [${{ github.ref_name }}]
-          Run #${{ github.run_number }}
-          Build status: $STATUS
-          Test results:
+          
+          Build: $STATUS
+          Testing:
           $TEST_RESULTS"
           
           curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" \

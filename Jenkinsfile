@@ -51,9 +51,9 @@ pipeline {
 
                 def message = """Jenkins Build
 [${branchName}]
-Run #${buildNumber}
-Build status: ${status}
-Test results:
+
+Build: ${status}
+Testing:
 ${testResults}"""
 
                 sh """
