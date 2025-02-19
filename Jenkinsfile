@@ -48,8 +48,6 @@ pipeline {
     post {
         always {
             script {
-                def status = (currentBuild.currentResult == 'SUCCESS') ? 'Success' : 'Failure'
-
                 def testResults = fileExists('results.txt') ? readFile('results.txt').trim() : 'No test results available'
 
                 def branchName = env.BRANCH_NAME ?: 'N/A'
@@ -58,7 +56,7 @@ pipeline {
                 def message = """Jenkins Build
 [${branchName}]
 
-Build: ${status}
+Build: ${buildStageStatus}
 Testing:
 ${testResults}"""
 
